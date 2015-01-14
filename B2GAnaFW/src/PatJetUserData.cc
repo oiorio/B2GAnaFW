@@ -25,7 +25,9 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TGraphAsymmErrors.h>
+
 #include <vector>
+#include <sstream>
 
 using namespace reco;
 using namespace edm;
@@ -47,56 +49,84 @@ private:
   edm::EDGetTokenT<std::vector<reco::Vertex> > pvToken_;
 
   //InputTag jetLabel_;
-  InputTag jLabel_, pvLabel_;
+  InputTag jLabel_, packedjLabel_, sjLabel_;
+  InputTag pvLabel_;
   InputTag triggerResultsLabel_, triggerSummaryLabel_;
   InputTag hltJetFilterLabel_;
   std::string hltPath_;
   double hlt2reco_deltaRmax_;
   HLTConfigProvider hltConfig;
   int triggerBit;
+  bool doSubjets_ ; 
  };
 
 
 PatJetUserData::PatJetUserData(const edm::ParameterSet& iConfig) :
  
    jLabel_(iConfig.getParameter<edm::InputTag>("jetLabel")),
+   packedjLabel_(iConfig.getParameter<edm::InputTag>("packedjetLabel")),
+   sjLabel_(iConfig.getParameter<edm::InputTag>("subjetLabel")),
    pvLabel_(iConfig.getParameter<edm::InputTag>("pv")),   // "offlinePrimaryVertex"
 
    triggerResultsLabel_(iConfig.getParameter<edm::InputTag>("triggerResults")),
    triggerSummaryLabel_(iConfig.getParameter<edm::InputTag>("triggerSummary")),
    hltJetFilterLabel_  (iConfig.getParameter<edm::InputTag>("hltJetFilter")),   //trigger objects we want to match
    hltPath_            (iConfig.getParameter<std::string>("hltPath")),
-   hlt2reco_deltaRmax_ (iConfig.getParameter<double>("hlt2reco_deltaRmax"))
+   hlt2reco_deltaRmax_ (iConfig.getParameter<double>("hlt2reco_deltaRmax")),
+   doSubjets_          (iConfig.getParameter<bool>("doSubjets"))
   {
     produces<vector<pat::Jet> >();
   }
 
-#include "DataFormats/JetReco/interface/Jet.h"
-
 void PatJetUserData::produce( edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //Jets
-  edm::Handle<std::vector<pat::Jet> > jetHandle;
+  edm::Handle<std::vector<pat::Jet> > jetHandle, subjetHandle;
   iEvent.getByLabel(jLabel_, jetHandle);
 
   auto_ptr<vector<pat::Jet> > jetColl( new vector<pat::Jet> (*jetHandle) );
 
-  for ( std::vector<pat::Jet>::const_iterator jetBegin = jetColl->begin(),
-	  jetEnd = jetColl->end(), jet = jetBegin; jet != jetEnd; ++jet ) {
+  if (doSubjets_) {
 
-    pat::Jet* subjet1 = dynamic_cast<pat::Jet*>((jet->daughter(0)));
-    double subjet1Bdisc = subjet1->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
-    std::cout << "success..." << subjet1Bdisc << std::endl;
-    pat::Jet* subjet2 = dynamic_cast<pat::Jet*>((jet->daughter(1)));
-    double subjet2Bdisc = subjet2->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
-    std::cout << "success..." << subjet2Bdisc << std::endl;
-    pat::Jet* subjet3 = dynamic_cast<pat::Jet*>((jet->daughter(2)));
-    double subjet3Bdisc = subjet3->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
-    std::cout << "success..." << subjet3Bdisc << std::endl;
+  }
 
-    jet->addUserFloat("subjet1csv", subjet1Bdisc);
-    jet->addUserFloat("subjet2csv", subjet2Bdisc);
-    jet->addUserFloat("subjet3csv", subjet3Bdisc);
+  for (size_t i = 0; i < jetColl->size(); i++){
+    pat::Jet*  jet = &(jetColl->at(i)) ; 
+
+    const edm::Ptr<reco::Jet> originalObjRef = edm::Ptr<reco::Jet>( jet->originalObjectRef() );
+
+    if ( doSubjets_ ) {
+      iEvent.getByLabel(packedjLabel_, packedjetHandle);
+      iEvent.getByLabel(sjLabel_, subjetHandle);
+      unsigned nSubjets = jet->numberOfDaughters();
+      std::cout << " Nsubjets = " << nSubjets << std::endl ; 
+      std::vector<int>sjindices(nSubjets) ;
+      for (unsigned is = 0; is < nSubjets; ++is) {
+        for (std::vector<pat::Jet>::const_iterator isj = subjetHandle->begin(); isj != subjetHandle->end(); ++isj) {
+          if ( originalObjRef->daughterPtr(is) == isj->originalObjectRef() ) {
+            sjindices.push_back(isj - subjetHandle->begin()) ; 
+            std::cout << " subjet found\n" ; 
+          }
+        }
+      }
+      jet->addUserFloat("subjetIndex0", sjindices.at(0)) ; 
+      jet->addUserFloat("subjetIndex1", sjindices.at(1)) ; 
+      sjindices.clear() ; 
+    }
+
+    /*
+       for (unsigned is = 0; is < nSubjets; ++is) {
+    //pat::Jet* subjet = dynamic_cast<pat::Jet*>((jet->daughter(is)));
+    edm::Ptr<reco::Candidate> const & subjet = jet->daughterPtr(is);
+    std::cout << " subjet " << is << " pt = " << subjet->pt() << std::endl ; 
+    //double subjetBdisc = subjet->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
+    edm::LogInfo("Subjet") << is << ". pt = " << subjet->pt() << " eta = " << subjet->eta() ; // << " CSV disc = " << subjetBdisc ;  
+    stringstream ss ;
+    ss << "subjet" << is << "csv" ; 
+    //jet->addUserFloat(ss.str(), subjetBdisc);
+    ss.clear() ; 
+    }
+    */ 
 
   }
 
@@ -105,7 +135,7 @@ void PatJetUserData::produce( edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-bool
+  bool
 PatJetUserData::isMatchedWithTrigger(const pat::Jet& p, trigger::TriggerObjectCollection triggerObjects, int& index, double& deltaR, double deltaRmax = 0.2)
 {
   for (size_t i = 0 ; i < triggerObjects.size() ; i++){
@@ -120,7 +150,7 @@ PatJetUserData::isMatchedWithTrigger(const pat::Jet& p, trigger::TriggerObjectCo
   return false;
 }
 
-double
+  double
 PatJetUserData::getResolutionRatio(double eta)
 {
   eta=fabs(eta);
@@ -134,7 +164,7 @@ PatJetUserData::getResolutionRatio(double eta)
   return -1.;
 }
 
-double
+  double
 PatJetUserData::getJERup(double eta)
 {
   eta=fabs(eta);
@@ -148,7 +178,7 @@ PatJetUserData::getJERup(double eta)
   return -1.;  
 }
 
-double
+  double
 PatJetUserData::getJERdown(double eta)
 {
   eta=fabs(eta);

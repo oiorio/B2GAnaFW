@@ -358,7 +358,7 @@ jetVars = (
      tag = cms.untracked.string("HLTjetDeltaR"),
      quantity = cms.untracked.string("userFloat('HLTjetDeltaR')")
     ),
-### SUBJETS
+### SUBSTRUCTURE VARS
     cms.PSet(
      tag = cms.untracked.string("tau1"),
      quantity = cms.untracked.string("userFloat('tau1')")
@@ -374,6 +374,14 @@ jetVars = (
     cms.PSet(
      tag = cms.untracked.string("tau4"),
      quantity = cms.untracked.string("userFloat('tau4')")
+    ),
+    cms.PSet(
+     tag = cms.untracked.string("subjetIndex0"),
+     quantity = cms.untracked.string("userFloat('subjetIndex0')")
+    ),
+    cms.PSet(
+     tag = cms.untracked.string("subjetIndex1"),
+     quantity = cms.untracked.string("userFloat('subjetIndex1')")
     ),
     cms.PSet(
      tag = cms.untracked.string("sjc2j0pt"),

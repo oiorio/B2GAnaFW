@@ -23,6 +23,7 @@ options.register('maxEvts',
 
 options.register('sample',
                  'file:/afs/cern.ch/work/d/decosa/public/DMtt/miniAOD_Phys14.root',
+                 #'/store/mc/Phys14DR/TprimeJetToTH_allHdecays_M1200GeV_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/20000/94117DA2-009A-E411-9DFB-002590494CB2.root',
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.string,
                  'Sample to analyze')
@@ -347,6 +348,7 @@ process.muonUserData = cms.EDProducer(
 process.patjetUserData = cms.EDProducer(
     'PatJetUserData',
     jetLabel  = cms.InputTag("selectedPatJetsAK8PFCHSPrunedPacked"),
+    subjetLabel  = cms.InputTag("selectedPatJetsAK8PFCHSPrunedSubjets"), 
     pv        = cms.InputTag(pvLabel),
     ### TTRIGGER ###
     triggerResults = cms.InputTag(triggerResultsLabel,"","HLT"),
@@ -354,6 +356,7 @@ process.patjetUserData = cms.EDProducer(
     hltJetFilter       = cms.InputTag("hltSixCenJet20L1FastJet"),
     hltPath            = cms.string("HLT_QuadJet60_DiJet20_v6"),
     hlt2reco_deltaRmax = cms.double(0.2),
+    doSubjets          = cms.bool(True) 
 )
 
 process.jetUserData = cms.EDProducer(
