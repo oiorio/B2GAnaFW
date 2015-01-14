@@ -34,99 +34,109 @@ using namespace edm;
 using namespace std;
 using namespace trigger;
 
+typedef std::vector<pat::Jet> PatJetCollection;
+
+struct orderByPt {
+  const std::string mCorrLevel;
+  orderByPt(const std::string& fCorrLevel) : mCorrLevel(fCorrLevel) {}
+  bool operator ()(PatJetCollection::const_iterator const& a, PatJetCollection::const_iterator const& b) {
+    if( mCorrLevel=="Uncorrected" ) return a->correctedJet("Uncorrected").pt() > b->correctedJet("Uncorrected").pt();
+    else return a->pt() > b->pt();
+  }
+};
+
+
 class PatJetUserData : public edm::EDProducer {
-public:
-  PatJetUserData( const edm::ParameterSet & );   
+  public:
+    PatJetUserData( const edm::ParameterSet & );   
 
-private:
-  void produce( edm::Event &, const edm::EventSetup & );
-  bool isMatchedWithTrigger(const pat::Jet&, trigger::TriggerObjectCollection,int&,double&,double);
-  double getResolutionRatio(double eta);
-  double getJERup(double eta);
-  double getJERdown(double eta);
+  private:
+    void produce( edm::Event &, const edm::EventSetup & );
+    bool isMatchedWithTrigger(const pat::Jet&, trigger::TriggerObjectCollection,int&,double&,double);
+    double getResolutionRatio(double eta);
+    double getJERup(double eta);
+    double getJERdown(double eta);
 
-  edm::EDGetTokenT<std::vector<pat::Jet> >     jetToken_;
-  edm::EDGetTokenT<std::vector<reco::Vertex> > pvToken_;
+    void matchPackedJets(const edm::Handle<PatJetCollection>& jets,
+        const edm::Handle<PatJetCollection>& packedjets,
+        std::vector<int>& matchedIndices) ; 
 
-  //InputTag jetLabel_;
-  InputTag jLabel_, packedjLabel_, sjLabel_;
-  InputTag pvLabel_;
-  InputTag triggerResultsLabel_, triggerSummaryLabel_;
-  InputTag hltJetFilterLabel_;
-  std::string hltPath_;
-  double hlt2reco_deltaRmax_;
-  HLTConfigProvider hltConfig;
-  int triggerBit;
-  bool doSubjets_ ; 
- };
+    edm::EDGetTokenT<std::vector<pat::Jet> >     jetToken_;
+    edm::EDGetTokenT<std::vector<reco::Vertex> > pvToken_;
+
+    //InputTag jetLabel_;
+    InputTag jLabel_, packedjLabel_, sjLabel_;
+    InputTag pvLabel_;
+    InputTag triggerResultsLabel_, triggerSummaryLabel_;
+    InputTag hltJetFilterLabel_;
+    std::string hltPath_;
+    double hlt2reco_deltaRmax_;
+    HLTConfigProvider hltConfig;
+    int triggerBit;
+    bool doSubjets_ ; 
+};
 
 
 PatJetUserData::PatJetUserData(const edm::ParameterSet& iConfig) :
- 
-   jLabel_(iConfig.getParameter<edm::InputTag>("jetLabel")),
-   packedjLabel_(iConfig.getParameter<edm::InputTag>("packedjetLabel")),
-   sjLabel_(iConfig.getParameter<edm::InputTag>("subjetLabel")),
-   pvLabel_(iConfig.getParameter<edm::InputTag>("pv")),   // "offlinePrimaryVertex"
 
-   triggerResultsLabel_(iConfig.getParameter<edm::InputTag>("triggerResults")),
-   triggerSummaryLabel_(iConfig.getParameter<edm::InputTag>("triggerSummary")),
-   hltJetFilterLabel_  (iConfig.getParameter<edm::InputTag>("hltJetFilter")),   //trigger objects we want to match
-   hltPath_            (iConfig.getParameter<std::string>("hltPath")),
-   hlt2reco_deltaRmax_ (iConfig.getParameter<double>("hlt2reco_deltaRmax")),
-   doSubjets_          (iConfig.getParameter<bool>("doSubjets"))
-  {
-    produces<vector<pat::Jet> >();
-  }
+  jLabel_(iConfig.getParameter<edm::InputTag>("jetLabel")),
+  packedjLabel_(iConfig.getParameter<edm::InputTag>("packedjetLabel")),
+  sjLabel_(iConfig.getParameter<edm::InputTag>("subjetLabel")),
+  pvLabel_(iConfig.getParameter<edm::InputTag>("pv")),   // "offlinePrimaryVertex"
+
+  triggerResultsLabel_(iConfig.getParameter<edm::InputTag>("triggerResults")),
+  triggerSummaryLabel_(iConfig.getParameter<edm::InputTag>("triggerSummary")),
+  hltJetFilterLabel_  (iConfig.getParameter<edm::InputTag>("hltJetFilter")),   //trigger objects we want to match
+  hltPath_            (iConfig.getParameter<std::string>("hltPath")),
+  hlt2reco_deltaRmax_ (iConfig.getParameter<double>("hlt2reco_deltaRmax")),
+  doSubjets_          (iConfig.getParameter<bool>("doSubjets"))
+{
+  produces<vector<pat::Jet> >();
+}
 
 void PatJetUserData::produce( edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  
+
   //Jets
-  edm::Handle<std::vector<pat::Jet> > jetHandle, subjetHandle;
+  edm::Handle<std::vector<pat::Jet> > jetHandle, packedjetHandle, subjetHandle;
   iEvent.getByLabel(jLabel_, jetHandle);
 
   auto_ptr<vector<pat::Jet> > jetColl( new vector<pat::Jet> (*jetHandle) );
 
+  int subjet0Id = -1, subjet1Id = -1 ; 
+  std::vector<int> matchedjetIndices;
   if (doSubjets_) {
+    iEvent.getByLabel(packedjLabel_, packedjetHandle);
+    iEvent.getByLabel(sjLabel_, subjetHandle);
+    if( packedjetHandle->size() > jetHandle->size() ) 
+      edm::LogError("TooManyGroomedJets") << "Groomed packed jet collection size " << jetHandle->size() 
+        << " bigger than original fat jet collection size " << jetHandle->size() ; 
+    matchPackedJets(jetHandle,packedjetHandle,matchedjetIndices);
 
-  }
-
-  for (size_t i = 0; i < jetColl->size(); i++){
-    pat::Jet*  jet = &(jetColl->at(i)) ; 
-
-    const edm::Ptr<reco::Jet> originalObjRef = edm::Ptr<reco::Jet>( jet->originalObjectRef() );
-
-    if ( doSubjets_ ) {
-      iEvent.getByLabel(packedjLabel_, packedjetHandle);
-      iEvent.getByLabel(sjLabel_, subjetHandle);
-      unsigned nSubjets = jet->numberOfDaughters();
-      std::cout << " Nsubjets = " << nSubjets << std::endl ; 
-      std::vector<int>sjindices(nSubjets) ;
-      for (unsigned is = 0; is < nSubjets; ++is) {
-        for (std::vector<pat::Jet>::const_iterator isj = subjetHandle->begin(); isj != subjetHandle->end(); ++isj) {
-          if ( originalObjRef->daughterPtr(is) == isj->originalObjectRef() ) {
-            sjindices.push_back(isj - subjetHandle->begin()) ; 
-            std::cout << " subjet found\n" ; 
+    for (size_t ii = 0; ii < jetColl->size(); ii++){
+      pat::Jet*  jet = &(jetColl->at(ii)) ; 
+      int pfjIdx = matchedjetIndices.at(ii) ; //// Get index of matched packed jet
+      int nSubjets = 0 ; 
+      std::vector<PatJetCollection::const_iterator> itsubjets ;
+      if (pfjIdx >= 0) {
+        nSubjets = packedjetHandle->at(pfjIdx).numberOfDaughters() ;
+        const edm::Ptr<reco::Jet> originalObjRef = edm::Ptr<reco::Jet>( packedjetHandle->at(pfjIdx).originalObjectRef() );
+        for (int isj = 0; isj < nSubjets; ++isj) {
+          for (std::vector<pat::Jet>::const_iterator itsj = subjetHandle->begin(); itsj != subjetHandle->end(); ++itsj) {
+            if ( originalObjRef->daughterPtr(isj) == itsj->originalObjectRef() ) {
+              itsubjets.push_back(itsj) ; 
+            }
           }
-        }
+        } //// Loop over subjets 
       }
-      jet->addUserFloat("subjetIndex0", sjindices.at(0)) ; 
-      jet->addUserFloat("subjetIndex1", sjindices.at(1)) ; 
-      sjindices.clear() ; 
-    }
-
-    /*
-       for (unsigned is = 0; is < nSubjets; ++is) {
-    //pat::Jet* subjet = dynamic_cast<pat::Jet*>((jet->daughter(is)));
-    edm::Ptr<reco::Candidate> const & subjet = jet->daughterPtr(is);
-    std::cout << " subjet " << is << " pt = " << subjet->pt() << std::endl ; 
-    //double subjetBdisc = subjet->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
-    edm::LogInfo("Subjet") << is << ". pt = " << subjet->pt() << " eta = " << subjet->eta() ; // << " CSV disc = " << subjetBdisc ;  
-    stringstream ss ;
-    ss << "subjet" << is << "csv" ; 
-    //jet->addUserFloat(ss.str(), subjetBdisc);
-    ss.clear() ; 
-    }
-    */ 
+      std::sort(itsubjets.begin(), itsubjets.end(), orderByPt("Uncorrected")); 
+      if ( itsubjets.size() > 1 ) {
+        subjet0Id = itsubjets.at(0) - subjetHandle->begin() ; 
+        subjet1Id = itsubjets.at(1) - subjetHandle->begin() ; 
+        jet->addUserInt("subjetIndex0", subjet0Id) ; 
+        jet->addUserInt("subjetIndex1", subjet1Id) ; 
+        std::cout << " 2 subjet found with indices " << subjet0Id << " and " << subjet1Id << "\n" ; 
+      }
+    } //// Looping over all jets  
 
   }
 
@@ -192,6 +202,39 @@ PatJetUserData::getJERdown(double eta)
   return -1.;  
 }
 
+// ------------ method that matches packed and original jets based on minimum dR ------------
+void PatJetUserData::matchPackedJets(const edm::Handle<PatJetCollection>& jets, 
+    const edm::Handle<PatJetCollection>& packedJets, std::vector<int>& matchedIndices) {
+
+  std::vector<bool> jetLocks(jets->size(),false);
+  std::vector<int>  jetIndices;
+
+  for(size_t pj=0; pj<packedJets->size(); ++pj) {
+    double matchedDR = 1e9;
+    int matchedIdx = -1;
+
+    for(size_t ij = 0; ij < jets->size(); ++ij) {
+      if( jetLocks.at(ij) ) continue; // skip jets that have already been matched
+
+      double tempDR = reco::deltaR( jets->at(ij).rapidity(), jets->at(ij).phi(), packedJets->at(pj).rapidity(), packedJets->at(pj).phi() );
+      if( tempDR < matchedDR ) {
+        matchedDR = tempDR;
+        matchedIdx = ij;
+      }
+    }
+
+    if( matchedIdx >= 0 ) jetLocks.at(matchedIdx) = true;
+    jetIndices.push_back(matchedIdx);
+  }
+
+  if( std::find( jetIndices.begin(), jetIndices.end(), -1 ) != jetIndices.end() )
+    edm::LogError("JetMatchingFailed") << "Matching groomed to original jets failed. Please check that the two jet collections belong to each other.";
+
+  for(size_t ij = 0; ij < jets->size(); ++ij) {
+    std::vector<int>::iterator matchedIndex = std::find( jetIndices.begin(), jetIndices.end(), ij );
+    matchedIndices.push_back( matchedIndex != jetIndices.end() ? std::distance(jetIndices.begin(),matchedIndex) : -1 );
+  }
+}
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 

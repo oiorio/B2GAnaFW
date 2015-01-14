@@ -377,11 +377,11 @@ jetVars = (
     ),
     cms.PSet(
      tag = cms.untracked.string("subjetIndex0"),
-     quantity = cms.untracked.string("userFloat('subjetIndex0')")
+     quantity = cms.untracked.string("userInt('subjetIndex0')")
     ),
     cms.PSet(
      tag = cms.untracked.string("subjetIndex1"),
-     quantity = cms.untracked.string("userFloat('subjetIndex1')")
+     quantity = cms.untracked.string("userInt('subjetIndex1')")
     ),
     cms.PSet(
      tag = cms.untracked.string("sjc2j0pt"),
@@ -775,7 +775,8 @@ jetsAK8.src = cms.InputTag("skimmedPatJetsAK8")
 
 ###patjets
 patjets = copy.deepcopy(basic)
-#patjets.variables += patjetVars
+patjets.variables += jetVars
+patjets.variables += jetAK8Vars
 patjets.prefix = cms.untracked.string("patjet")
 patjets.src = cms.InputTag("patjetUserData")
 
