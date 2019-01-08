@@ -8,10 +8,13 @@ header = """
 ###
 ### Examples: 
 ###
-###    Running on 25 ns data in 94X ReReco, Mar 2018, MiniAODv2
+###    Running on 25 ns data in 94X ReReco, Mar 2018, MiniAODv2 for 2017 data
 ###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='Data_94X' sample='/store/data/Run2017F/MET/MINIAOD/31Mar2018-v1/910000/A0858FDD-E73B-E811-803F-0CC47A7C34A6.root'
+###    Running on 25 ns data in 94X ReMiniAOD, Jul 2018, MiniAODv2 for 2016 data
+###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='Data_94X_2016' sample='/store/data/Run2016H/SingleMuon/MINIAOD/07Aug17-v1/90000/FEF48B98-A68F-E711-99BB-008CFAF73190.root'
 ###    Running on 25 ns data in 94X MC, MiniAODv2
 ###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='MC_Fall17MiniAODv2' sample='/store/mc/RunIIFall17MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/0044D634-7FED-E711-B0EF-0242AC130002.root'
+### 
 ###
 ### Older version
 ###    Previous tags for Nov2017 ReReco are:  'Data_94X_Nov17','MC_Fall17MiniAODv1'\
@@ -35,7 +38,9 @@ options = opts.VarParsing ('analysis')
 
 options.register('sample',
 #     '/store/mc/RunIIFall17MiniAOD/QCD_HT500to700_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/20000/00108AFB-75FB-E711-A917-0025905B85A0.root',
-      '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/10000/04A554D5-966A-E811-AEE2-001EC94B51EC.root ',
+#'/store/data/Run2016H/SingleMuon/MINIAOD/07Aug17-v1/90000/FEF48B98-A68F-E711-99BB-008CFAF73190.root'
+'/store/data/Run2016H/SingleMuon/MINIAOD/17Jul2018-v1/40000/FECFA65B-8C8B-E811-A529-001E67A3FEAC.root ',
+#      '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/10000/04A554D5-966A-E811-AEE2-001EC94B51EC.root ',
      opts.VarParsing.multiplicity.singleton,
      opts.VarParsing.varType.string,
      'Sample to analyze')
@@ -52,7 +57,7 @@ options.register('DataProcessing',
     opts.VarParsing.multiplicity.singleton,
     opts.VarParsing.varType.string,
     'Data processing types. Options are:\
-                   Data_94X and MC_Fall17MiniAODv2\
+                   Data_94X, Data_94X_2016, MC_Fall17MiniAODv2, MC_Summer16MiniAODv3 \
                    Previous version pre-ReMiniAOD for comparison are\
                    Data_94X_Nov17 and MC_Fall17MiniAODv1'
     )
@@ -119,17 +124,21 @@ if options.DataProcessing == "":
 if options.globalTag != "": 
   print "!!!!WARNING: You have chosen globalTag as", options.globalTag, ". Please check if this corresponds to your dataset."
 else: 
-  if "Data_94X" in options.DataProcessing:
-    options.globalTag="94X_dataRun2_v6"
+  if options.DataProcessing== "Data_94X":
+    options.globalTag="94X_dataRun2_v11"
+  elif options.DataProcessing== "Data_94X_2016":
+    options.globalTag="94X_dataRun2_v10"
   elif "MC_Fall17MiniAOD"in options.DataProcessing:
-    options.globalTag="94X_mc2017_realistic_v14"
+    options.globalTag="94X_mc2017_realistic_v17"
+  elif "MC_Summer16MiniAOD"in options.DataProcessing:
+    options.globalTag="94X_mcRun2_asymptotic_v3"
   else:
     sys.exit("!!!!ERROR: Enter 'DataProcessing' period. Options are: \
       'Data_94X', 'MC_Fall17MiniAODv2' \
-      'Data_94X_Nov17', 'MC_Fall17MiniAODv1' \
+      'Data_94X_2016', 'MC_Summer16MiniAODv3' \
       .\n")
 
-if "Data_94X" in options.DataProcessing  or  "MC_Fall17MiniAOD" in options.DataProcessing: ### Use no HF met until a solution is found
+if options.DataProcessing == "Data_94X"  or "MC_Fall17MiniAOD" in options.DataProcessing: ### Use no HF met until a solution is found
   options.useNoHFMET=True
 
 
@@ -156,8 +165,10 @@ triggerResultsLabel 	 = "TriggerResults"
 triggerSummaryLabel 	 = "hltTriggerSummaryAOD"
 hltElectronFilterLabel = "hltL1sL1Mu3p5EG12ORL1MuOpenEG12L3Filtered8"
 
-if "MC" in options.DataProcessing or "Data_94X" in options.DataProcessing:
+if "MC" in options.DataProcessing or options.DataProcessing ==  "Data_94X":
   metProcess = "PAT"
+elif options.DataProcessing ==  "Data_94X_2016":
+  metProcess = "DQM"
 elif "Nov17" in option.DataProcessing:
   metProcess = "RECO"
 hltProcess = "HLT"
@@ -646,14 +657,17 @@ process.skimmedPatPuppiMET = cms.EDFilter(
 
 
 ##### THERE IS NO slimmedMETsNoHF in miniAODv2
-if( options.useNoHFMET ):
 
-  process.skimmedPatMETNoHF = cms.EDFilter(
-    "PATMETSelector",
-    src = cms.InputTag(metNoHFLabel, "", metProcess),
-    cut = cms.string("")
-    )
+if(not options.useNoHFMET ): metNoHFLabel=metLabel
 
+
+process.skimmedPatMETNoHF = cms.EDFilter(
+  "PATMETSelector",
+  src = cms.InputTag(metNoHFLabel, "", metProcess),
+  cut = cms.string("")
+  )
+
+  
 
 process.eventUserData = cms.EDProducer(
     'EventUserData',
