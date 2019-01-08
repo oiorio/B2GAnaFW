@@ -318,6 +318,14 @@ jetVars = (
       tag = cms.untracked.string("CvsB"),
       quantity = cms.untracked.string("bDiscriminator('pfCombinedCvsBJetTags')")
       ),
+    cms.PSet(
+      tag = cms.untracked.string("DeepCSV"),
+      quantity = cms.untracked.string("bDiscriminator('pfDeepCSVJetTags:probb')")
+      ),
+    cms.PSet(
+      tag = cms.untracked.string("DeepCSVv2"),
+      quantity = cms.untracked.string("bDiscriminator('pfDeepCSVDiscriminatorsJetTags:BvsAll')")
+      ),
     #cms.PSet(
     #  tag = cms.untracked.string("CMVA"),
     #  quantity = cms.untracked.string("bDiscriminator('pfCombinedMVAV2BJetTags')")
