@@ -31,6 +31,7 @@ git cms-init
 ```
 git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
 git cms-merge-topic cms-met:METFixEE2017_949_v2
+```
 * Compile this first part 
 ```
 scram b -j 10
