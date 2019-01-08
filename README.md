@@ -35,7 +35,7 @@ git cms-merge-topic cms-met:METFixEE2017_949_v2
 ```
 scram b -j 10
 ```
-git clone git@github.com:cmsb2g/B2GAnaFW.git Analysis/B2GAnaFW -b CMSSW_9_4_X_V0
+git clone git@github.com:oiorio/B2GAnaFW.git Analysis/B2GAnaFW -b CMSSW_9_4_X_V2
 git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_94X_v3
 git cms-addpkg RecoMET/METFilters
 ```
