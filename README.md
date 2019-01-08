@@ -34,7 +34,9 @@ git cms-merge-topic cms-met:METFixEE2017_949_v2
 ```
 * Compile this first part 
 ```
-scram b -j 10
+scram b 
+```
+* note: the compilation can be done also with -j 10 to spare some time, but it might fail occasionally because of the overlapping compilation generating conflicts. If it does, try again with a lower number of processors.
 ```
 git clone git@github.com:oiorio/B2GAnaFW.git Analysis/B2GAnaFW -b CMSSW_9_4_X_V2
 git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_94X_v3
@@ -42,7 +44,8 @@ git cms-addpkg RecoMET/METFilters
 ```
  * Compile (patience please!)
 ```
-scram b -j 10
+scram b 
+* same note as above :)
 ```
 
 ## Running
