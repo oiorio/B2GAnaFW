@@ -173,7 +173,7 @@ elif "Nov17" in option.DataProcessing:
   metProcess = "RECO"
 hltProcess = "HLT"
 
-doElectronEnergyCorr=True
+doElectronEnergyCorr=False
 #if "ReMiniAOD" in options.DataProcessing:
 #MiniAODv2*mc2017_realistic  doElectronEnergyCorr=False
 
@@ -213,8 +213,8 @@ process.load("Configuration.EventContent.EventContent_cff")
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.Services_cff')
-process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
-process.load("RecoEgamma.ElectronIdentification.ElectronIDValueMapProducer_cfi")
+#process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
+#process.load("RecoEgamma.ElectronIdentification.ElectronIDValueMapProducer_cfi")
 #process.load('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff')
 
 corrections = ['L1FastJet', 'L2Relative', 'L3Absolute']
@@ -814,18 +814,18 @@ process.electronUserData = cms.EDProducer(
     triggerSummary = cms.InputTag(triggerSummaryLabel,"",hltProcess),
     hltElectronFilter  = cms.InputTag(hltElectronFilterLabel),  ##trigger matching code to be fixed!
     # VID now are called directly from the ElectronID and added as userData in the entuples. Example below of the ones available for 2017 data:
-    #vidLooseLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V1-loose"),
-    #vidMediumLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V1-medium"),
-    #vidTightLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V1-tight"),
-    #vidVetoLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V1-veto"),
+    vidLooseLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V2-loose"),
+    vidMediumLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V2-medium"),
+    vidTightLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V2-tight"),
+    vidVetoLabel = cms.untracked.string("cutBasedElectronID-Fall17-94X-V2-veto"),
     #
-    #vidLooseMVALabel = cms.untracked.string("mvaEleID-Fall17-iso-V1-wpLoose"),
-    #vidMediumMVALabel = cms.untracked.string("mvaEleID-Fall17-iso-V1-wp90"),
-    #vidTightMVALabel = cms.untracked.string("mvaEleID-Fall17-iso-V1-wp80"),
-    #
-    #vidLooseNoIsoLabel = cms.untracked.string("mvaEleID-Fall17-noIso-V1-wpLoose"),
-    #vidMediumNoIsoLabel = cms.untracked.string("mvaEleID-Fall17-noIso-V1-wp90"),
-    #vidTightNoIsoLabel = cms.untracked.string("mvaEleID-Fall17-noIso-V1-wp80"),
+    vidLooseMVALabel = cms.untracked.string("mvaEleID-Fall17-iso-V2-wpLoose"),
+    vidMediumMVALabel = cms.untracked.string("mvaEleID-Fall17-iso-V2-wp90"),
+    vidTightMVALabel = cms.untracked.string("mvaEleID-Fall17-iso-V2-wp80"),
+    
+    vidLooseNoIsoLabel = cms.untracked.string("mvaEleID-Fall17-noIso-V2-wpLoose"),
+    vidMediumNoIsoLabel = cms.untracked.string("mvaEleID-Fall17-noIso-V2-wp90"),
+    vidTightNoIsoLabel = cms.untracked.string("mvaEleID-Fall17-noIso-V2-wp80"),
     #
     #vidHEEPLabel = cms.untracked.string("heepElectronID-HEEPV70"),
 
@@ -837,13 +837,26 @@ process.electronUserData = cms.EDProducer(
 phoInputTag=cms.InputTag(phoLabel) #calibratedPhotons need to be used when running corrections
 if not doElectronEnergyCorr:
   phoInputTag = cms.InputTag("slimmedPhotons","","@skipCurrentProcess") #otherwise slimmed photons do have corrections
+#***
+#process.photonIDValueMapProducer = cms.EDProducer("PhoIsoValueMapProducer",
+#     src = cms.InputTag("slimmedPhotons"),
+#     relative = cms.bool(False),
+#     rho_PFIso = cms.InputTag("fixedGridRhoFastjetAll"),
+#     mapIsoChg = cms.InputTag("photonIDValueMapProducer:phoChargedIsolation"),
+#     mapIsoNeu = cms.InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"),
+#     mapIsoPho = cms.InputTag("photonIDValueMapProducer:phoPhotonIsolation"),
+#     EAFile_PFIso_Chg = cms.FileInPath("RecoEgamma/PhotonIdentification/data/Fall17/effAreaPhotons_cone03_pfChargedHadrons_90percentBased_V2.txt"),
+#     EAFile_PFIso_Neu = cms.FileInPath("RecoEgamma/PhotonIdentification/data/Fall17/effAreaPhotons_cone03_pfNeutralHadrons_90percentBased_V2.txt"),
+#     EAFile_PFIso_Pho = cms.FileInPath("RecoEgamma/PhotonIdentification/data/Fall17/effAreaPhotons_cone03_pfPhotons_90percentBased_V2.txt"),
+#)
+#***
 process.photonUserData = cms.EDProducer(
     'PhotonUserData',
     rho                     = cms.InputTag(rhoLabel),
     pholabel                = phoInputTag,
-    phoLooseIdMap           = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Fall17-94X-V1-loose"),
-    phoMediumIdMap          = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Fall17-94X-V1-medium"),
-    phoTightIdMap           = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Fall17-94X-V1-tight"),
+    phoLooseIdMap           = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Fall17-94X-V2-loose"),
+    phoMediumIdMap          = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Fall17-94X-V2-medium"),
+    phoTightIdMap           = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Fall17-94X-V2-tight"),
     phoChgIsoMap            = cms.InputTag("photonIDValueMapProducer:phoChargedIsolation"),
     phoPhoIsoMap            = cms.InputTag("photonIDValueMapProducer:phoPhotonIsolation"),
     phoNeuIsoMap            = cms.InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"),
@@ -868,17 +881,52 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 ### -------------------------------------------------------------------
 
 # define which IDs we want to produce
-my_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V1_TrueVtx_cff' ]
 
-my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_cff',
-                  'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V1_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
+
+
+#_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V1_TrueVtx_cff' ]
+
+#my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V1_cff',
+#                  'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V1_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
+
 
 #Re-running electron smearing
 
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+#
+#  if options.DataProcessing== "Data_94X":
+#    options.globalTag="94X_dataRun2_v11"
+#  elif options.DataProcessing== "Data_94X_2016":
+#    options.globalTag="94X_dataRun2_v10"
+#  elif "MC_Fall17MiniAOD"in options.DataProcessing:
+#    options.globalTag="94X_mc2017_realistic_v17"
+#  elif "MC_Summer16MiniAOD"in options.DataProcessing:
+#    options.globalTag="94X_mcRun2_asymptotic_v3"
 
+
+if options.DataProcessing== "Data_94X" or options.DataProcessing=="MC_Fall17MiniAODv2":
+  my_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff' ]
+  my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff','RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V2_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V2_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
+  setupEgammaPostRecoSeq(process,
+                       runVID=True, #saves CPU time by not needlessly re-running VID, if you want the Fall17V2 IDs, set this to True or remove (default is True)           
+                       eleIDModules=my_eid_modules,
+                       phoIDModules=my_phoid_modules,
+                         era='2017-Nov17ReReco')  
+
+
+if options.DataProcessing== "Data_94X_2016" or options.DataProcessing=="MC_Summer16MiniAODv3":
+  my_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff' ]
+  my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff','RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V2_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V2_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
+  setupEgammaPostRecoSeq(process,
+                       runEnergyCorrections=False, #corrections by default are fine so no need to re-run
+                       eleIDModules=my_eid_modules,
+                       phoIDModules=my_phoid_modules,
+                       era='2016-Legacy')  
+
+  
 #If energy smearing is off, this will apply the electronID producing a collection named calibratedPatElectrons
-setupEgammaPostRecoSeq(process,applyEnergyCorrections=doElectronEnergyCorr,
+if doElectronEnergyCorr:
+  setupEgammaPostRecoSeq(process,applyEnergyCorrections=doElectronEnergyCorr,
                        applyVIDOnCorrectedEgamma=doElectronEnergyCorr,
                        isMiniAOD=True,
                        eleIDModules=my_eid_modules,

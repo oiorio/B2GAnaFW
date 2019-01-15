@@ -29,6 +29,7 @@ git cms-init
 
 ### Clone the github repositories
 ```
+git cms-merge-topic cms-egamma:EgammaID_949
 git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
 git cms-merge-topic cms-met:METFixEE2017_949_v2
 ```
