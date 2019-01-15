@@ -138,6 +138,7 @@ else:
       'Data_94X_2016', 'MC_Summer16MiniAODv3' \
       .\n")
 
+
 if options.DataProcessing == "Data_94X"  or "MC_Fall17MiniAOD" in options.DataProcessing: ### Use no HF met until a solution is found
   options.useNoHFMET=True
 
@@ -288,6 +289,7 @@ elif "MC" in options.DataProcessing:
   jer_era = "Spring16_25nsV6_MC"
 else: sys.exit("!!!!ERROR: Enter 'DataProcessing' period.\n")
 
+
 if options.usePrivateSQLiteForJER:
     # JER
     #   https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution#Accessing_factors_from_Global_Ta
@@ -362,6 +364,7 @@ if options.usePrivateSQLiteForJER:
 			)
     ) 
     process.es_prefer_jer = cms.ESPrefer('PoolDBESSource', 'jer')
+
 
 
 ### ------------------------------------------------------------------
@@ -518,6 +521,27 @@ if options.useNoHFMET:
 
   #jets are rebuilt from those candidates by the tools, no need to do anything else
 ### =================================================================================
+
+### ---------------------------------------------------------------------------
+### L1Prefiring to be added for 2016 and 2017
+### ---------------------------------------------------------------------------
+
+if "MC_Fall17MiniAOD" in options.DataProcessing or "MC_Symmer16MiniAOD" in options.DataProcessing:
+  dataEra="2017BtoF"
+  if "MC_Symmer16MiniAOD" in options.DataProcessing:
+    dataEra="2016BtoH"
+  process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
+                                           ThePhotons = cms.InputTag("slimmedPhotons"),
+                                           TheJets = cms.InputTag("slimmedJets"),
+                                           L1Maps = cms.string("L1PrefiringMaps_new.root"), # update this line with the location of this file
+                                           DataEra = cms.string(dataEra), #Use 2016BtoH for 2016
+                                           UseJetEMPt = cms.bool(False), #can be set to true to use jet prefiring maps parametrized vs pt(em) instead of pt
+                                           PrefiringRateSystematicUncty = cms.double(0.2) #Minimum relative prefiring uncty per object
+                                           )
+
+### ---------------------------------------------------------------------------
+### ecalBadCalibFilter to be re-run for 2017 and 2018 
+### ---------------------------------------------------------------------------
 
 process.load('RecoMET.METFilters.ecalBadCalibFilter_cfi')
 
@@ -1042,6 +1066,7 @@ process.edmNtuplesOut = cms.OutputModule(
     "keep *_muons_*_*",
     "keep *_vertexInfo_*_*",
     "keep *_electrons_*_*",
+    "keep *_prefiringweight_*_*",
     "keep *_electronUserData_*_*",
     "keep *_slimmedElectrons_*_*",
     "keep *_slimmedPhotons_*_*",

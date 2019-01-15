@@ -42,6 +42,7 @@ scram b
 git clone git@github.com:oiorio/B2GAnaFW.git Analysis/B2GAnaFW -b CMSSW_9_4_X_V2
 git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_94X_v3
 git cms-addpkg RecoMET/METFilters
+git cms-merge-topic lathomas:L1Prefiring_9_4_9
 ```
  * Compile (patience please!)
 ```
