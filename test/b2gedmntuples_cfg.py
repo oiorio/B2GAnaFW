@@ -384,6 +384,7 @@ listBtagDiscriminatorsAK4 = [
 		'pfCombinedCvsBJetTags',
                 'pfDeepCSVDiscriminatorsJetTags:BvsAll',
                 'pfDeepCSVJetTags:probb',
+                'pfDeepCSVJetTags:probbb',
 
 		]
 listBtagDiscriminatorsAK8 = [ 
@@ -396,6 +397,7 @@ listBtagDiscriminatorsAK8 = [
 		'pfBoostedDoubleSecondaryVertexCA15BJetTags',
                 'pfDeepCSVDiscriminatorsJetTags:BvsAll',
                 'pfDeepCSVJetTags:probb',
+                'pfDeepCSVJetTags:probbb',
 		]
 
 runMC = ("MC" in options.DataProcessing)
