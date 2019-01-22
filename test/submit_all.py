@@ -14,7 +14,7 @@ def getOptions() :
     Parse and return the arguments provided by the user.
     """
     usage = ('usage: python submit_all.py -c CFG -p PYCFGPARAMS -o OUTPUTLFNDIRBASE -d DIR -v VERSION -f DATASETS -s STORAGESITE')
-
+    # python submit_all.py -c b2gedmntuples_cfg.py -p DataProcessing='MC_Fall17MiniAOD' -d crab_10May -v 
     parser = OptionParser(usage=usage)    
     parser.add_option("-c", "--config", dest="cfg", default="b2gedmntuples_cfg.py",
         help=("The crab script you want to submit "),
@@ -35,7 +35,7 @@ def getOptions() :
         metavar="PARAMS")
     parser.add_option("-l", "--lumiMask", dest="lumiMask",
         #default='https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-274443_13TeV_PromptReco_Collisions16_JSON.txt',
-        default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T_v2.txt',
+        default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt',
         help=("The JSON file containing good lumi list"),
         metavar="LUMI")
     parser.add_option("-f", "--datasets", dest="datasets",
@@ -50,6 +50,10 @@ def getOptions() :
     parser.add_option("-o", "--outLFNDirBase", dest="outLFNDirBase", 
         help=("EOS path for storage"),
         metavar="LFN")
+    parser.add_option("-n", "--dryRun", dest="dryRun",
+        help=("do nothiny"),
+        metavar="dryRun")
+
     (options, args) = parser.parse_args()
 
 
@@ -76,9 +80,10 @@ def main():
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = options.cfg
+    inFiles=["L1PrefiringMaps_new.root"]
     if options.inputFiles != None:
       inFiles = glob.glob( options.inputFiles )
-      config.JobType.inputFiles = inFiles #options.inputFiles
+    config.JobType.inputFiles = inFiles #options.inputFiles
     config.JobType.pyCfgParams = options.pyCfgParams
     config.JobType.sendExternalFolder = True
     
@@ -92,7 +97,7 @@ def main():
 
     print 'Using config ' + options.cfg
     print 'Writing to versionectory ' + options.version
-    
+#    if not options.dryRun==True:
     def submit(config):
         try:
             crabCommand('submit', config = config)
@@ -128,20 +133,26 @@ def main():
         elif datatier == 'MINIAOD': 
           config.Data.splitting = 'LumiBased'
           config.Data.lumiMask = options.lumiMask
+          config.Data.unitsPerJob = 24
 	if options.outLFNDirBase and not options.outLFNDirBase.isspace(): 
           config.Data.outLFNDirBase = os.path.join(options.outLFNDirBase,options.version,ptbin,cond.split('-')[0])
         config.Data.outputDatasetTag = cond+'_'+options.version
         print 'Submitting ' + config.General.requestName + ', dataset = ' + job
         print 'Configuration :'
         print config
-        try :
-            from multiprocessing import Process
-            p = Process(target=submit, args=(config,))
-            p.start()
-            p.join()
-            submit(config)
-        except :
-            print 'Not submitted.'
+        if options.dryRun!= None:
+            print "dry run not submitting"
+
+        if options.dryRun==None:
+            print "dry run false, submitting!"
+            try :
+                from multiprocessing import Process
+                p = Process(target=submit, args=(config,))
+                p.start()
+                p.join()
+                submit(config)
+            except :
+                print 'Not submitted.'
 
 
 
