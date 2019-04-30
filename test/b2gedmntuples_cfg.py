@@ -528,9 +528,9 @@ if options.useNoHFMET:
 ### L1Prefiring to be added for 2016 and 2017
 ### ---------------------------------------------------------------------------
 
-if "MC_Fall17MiniAOD" in options.DataProcessing or "MC_Symmer16MiniAOD" in options.DataProcessing:
+if "MC_Fall17MiniAOD" in options.DataProcessing or "MC_Summer16MiniAOD" in options.DataProcessing:
   dataEra="2017BtoF"
-  if "MC_Symmer16MiniAOD" in options.DataProcessing:
+  if "MC_Summer16MiniAOD" in options.DataProcessing:
     dataEra="2016BtoH"
   process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
                                            ThePhotons = cms.InputTag("slimmedPhotons"),
@@ -944,7 +944,7 @@ if options.DataProcessing== "Data_94X_2016" or options.DataProcessing=="MC_Summe
   my_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff' ]
   my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff','RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V2_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V2_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
   setupEgammaPostRecoSeq(process,
-                       runEnergyCorrections=False, #corrections by default are fine so no need to re-run
+                       applyEnergyCorrections=False, #corrections by default are fine so no need to re-run
                        eleIDModules=my_eid_modules,
                        phoIDModules=my_phoid_modules,
                        era='2016-Legacy')  

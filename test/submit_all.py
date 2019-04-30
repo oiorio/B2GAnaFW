@@ -133,7 +133,7 @@ def main():
         elif datatier == 'MINIAOD': 
           config.Data.splitting = 'LumiBased'
           config.Data.lumiMask = options.lumiMask
-          config.Data.unitsPerJob = 24
+          config.Data.unitsPerJob = 10
 	if options.outLFNDirBase and not options.outLFNDirBase.isspace(): 
           config.Data.outLFNDirBase = os.path.join(options.outLFNDirBase,options.version,ptbin,cond.split('-')[0])
         config.Data.outputDatasetTag = cond+'_'+options.version
