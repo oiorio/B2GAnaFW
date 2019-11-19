@@ -11,10 +11,10 @@ This is a development branch of the B2G EDMNtuples to be used for 2017 data (Run
 ### Working release
  * Make a new CMSSW area:
 ```
-setenv SCRAM_ARCH slc6_amd64_gcc630 ; ###chs/ tcsh 
-export SCRAM_ARCH=slc6_amd64_gcc630 ; ### bash
-cmsrel CMSSW_9_4_9
-cd CMSSW_9_4_9/src
+setenv SCRAM_ARCH slc7_amd64_gcc700 ; ###chs/ tcsh 
+export SCRAM_ARCH=slc7_amd64_gcc700 ; ### bash
+cmsrel CMSSW_10_2_9
+cd CMSSW_10_2_9/src
 cmsenv
 ```
  * Mirror for github
@@ -29,25 +29,19 @@ git cms-init
 
 ### Clone the github repositories
 ```
-git cms-merge-topic cms-egamma:EgammaID_949
-git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
-git cms-merge-topic cms-met:METFixEE2017_949_v2
-```
-* Compile this first part 
-```
-scram b 
-```
-* note: the compilation can be done also with -j 10 to spare some time, but it might fail occasionally because of the overlapping compilation generating conflicts. If it does, try again with a lower number of processors.
-```
-git clone git@github.com:oiorio/B2GAnaFW.git Analysis/B2GAnaFW -b CMSSW_9_4_X_V2
-git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_94X_v3
+git cms-merge-topic cms-met:METFixEE2017_949_v2_backport_to_102X
+git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_102X_v1
 git cms-addpkg RecoMET/METFilters
-git cms-merge-topic lathomas:L1Prefiring_9_4_9
-```
+git cms-merge-topic cms-egamma:EgammaPostRecoTools
+git clone git@github.com:oiorio/B2GAnaFW.git Analysis/B2GAnaFW -b 10_2_X
  * Compile (patience please!)
 ```
-scram b 
+scram b -j 4
 * same note as above :)
+
+* note: the compilation can be done also with -j 10 to spare some time, but it might fail occasionally because of the overlapping compilation generating conflicts. If it does, try again with a lower number of processors.
+```
+```
 ```
 
 ## Running
