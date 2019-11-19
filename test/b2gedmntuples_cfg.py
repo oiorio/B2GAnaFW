@@ -8,20 +8,22 @@ header = """
 ###
 ### Examples: 
 ###
+###    Running on 25 ns data in 102X ReReco, Sep 2018, MiniAOD for 2018 RunABC data 
+###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='Data_102X_ABC' sample='/store/data/Run2018A/MET/MINIAOD/17Sep2018-v1/100000/4D961A39-A211-B940-B972-24E8C7430EA3.root'
+###
+###
 ###    Running on 25 ns data in 94X ReReco, Mar 2018, MiniAODv2 for 2017 data
 ###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='Data_94X' sample='/store/data/Run2017F/MET/MINIAOD/31Mar2018-v1/910000/A0858FDD-E73B-E811-803F-0CC47A7C34A6.root'
 ###    Running on 25 ns data in 94X ReMiniAOD, Jul 2018, MiniAODv2 for 2016 data
 ###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='Data_94X_2016' sample='/store/data/Run2016H/SingleMuon/MINIAOD/07Aug17-v1/90000/FEF48B98-A68F-E711-99BB-008CFAF73190.root'
-###    Running on 25 ns data in 94X MC, MiniAODv2
+###
+###    Running on 25 ns MC in 102X MC, MiniAOD
+###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='MC_Autumn18MiniAOD' sample='/store/mc/RunIIAutumn18MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/C917872D-FD14-1843-B07F-523286EB5121.root'
+###
+###    Running on 25 ns MC in 94X MC, MiniAODv2
 ###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='MC_Fall17MiniAODv2' sample='/store/mc/RunIIFall17MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/0044D634-7FED-E711-B0EF-0242AC130002.root'
 ### 
 ###
-### Older version
-###    Previous tags for Nov2017 ReReco are:  'Data_94X_Nov17','MC_Fall17MiniAODv1'\
-###    Running on 25 ns data in 94X ReReco
-###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='Data_94X_Nov17' sample='/store/data/Run2017B/SingleMuon/MINIAOD/17Nov2017-v1/40000/0021369B-9BD8-E711-BFE9-FA163EAA42CB.root'
-###    Running on 25 ns data in 94X MC
-###        cmsRun b2gedmntuples_cfg.py maxEvents=1000 DataProcessing='MC_Fall17MiniAODv1' sample='/store/mc/RunIIFall17MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/00000/0044D634-7FED-E711-B0EF-0242AC130002.root'
 ###
 ### **** If you are running a test, locally, add the option runCRAB=False at the end. ****
 ###
@@ -39,12 +41,15 @@ options = opts.VarParsing ('analysis')
 options.register('sample',
 #     '/store/mc/RunIIFall17MiniAOD/QCD_HT500to700_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/20000/00108AFB-75FB-E711-A917-0025905B85A0.root',
 #'/store/data/Run2016H/SingleMuon/MINIAOD/07Aug17-v1/90000/FEF48B98-A68F-E711-99BB-008CFAF73190.root'
-'/store/data/Run2016H/SingleMuon/MINIAOD/17Jul2018-v1/40000/FECFA65B-8C8B-E811-A529-001E67A3FEAC.root ',
+#'/store/data/Run2016H/SingleMuon/MINIAOD/17Jul2018-v1/40000/FECFA65B-8C8B-E811-A529-001E67A3FEAC.root ',
+'/store/mc/RunIIAutumn18MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/C917872D-FD14-1843-B07F-523286EB5121.root' ,
+# Dataset: /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM 
+# File name: /store/data/Run2018A/MET/MINIAOD/17Sep2018-v1/100000/4D961A39-A211-B940-B972-24E8C7430EA3.root 
+
 #      '/store/mc/RunIIFall17MiniAODv2/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/10000/04A554D5-966A-E811-AEE2-001EC94B51EC.root ',
      opts.VarParsing.multiplicity.singleton,
      opts.VarParsing.varType.string,
      'Sample to analyze')
-
 
 options.register('outputLabel',
     'B2GEDMNtuple.root',
@@ -57,7 +62,7 @@ options.register('DataProcessing',
     opts.VarParsing.multiplicity.singleton,
     opts.VarParsing.varType.string,
     'Data processing types. Options are:\
-                   Data_94X, Data_94X_2016, MC_Fall17MiniAODv2, MC_Summer16MiniAODv3 \
+                   Data_94X, Data_94X_2016, Data_102X_ABC, Data_102X_D, MC_Fall17MiniAODv2, MC_Summer16MiniAODv3, MC_Autumn18MiniAOD \
                    Previous version pre-ReMiniAOD for comparison are\
                    Data_94X_Nov17 and MC_Fall17MiniAODv1'
     )
@@ -128,10 +133,16 @@ else:
     options.globalTag="94X_dataRun2_v11"
   elif options.DataProcessing== "Data_94X_2016":
     options.globalTag="94X_dataRun2_v10"
+  elif options.DataProcessing== "Data_102X_ABC":
+    options.globalTag="102X_dataRun2_Sep2018ABC_v2"
+  elif options.DataProcessing== "Data_102X_D":
+    options.globalTag="102X_dataRun2_Prompt_v13"
   elif "MC_Fall17MiniAOD"in options.DataProcessing:
     options.globalTag="94X_mc2017_realistic_v17"
   elif "MC_Summer16MiniAOD"in options.DataProcessing:
     options.globalTag="94X_mcRun2_asymptotic_v3"
+  elif "MC_Autumn18MiniAOD"in options.DataProcessing:
+    options.globalTag="102X_upgrade2018_realistic_v18"
   else:
     sys.exit("!!!!ERROR: Enter 'DataProcessing' period. Options are: \
       'Data_94X', 'MC_Fall17MiniAODv2' \
@@ -139,9 +150,9 @@ else:
       .\n")
 
 
-if options.DataProcessing == "Data_94X"  or "MC_Fall17MiniAOD" in options.DataProcessing: ### Use no HF met until a solution is found
+if options.DataProcessing == "Data_94X"  or "MC_Fall17MiniAOD" in options.DataProcessing or "Data_102X" in options.DataProcessing or "MC_Autumn18" in options.DataProcessing: ### Use no HF met until a solution is found
   options.useNoHFMET=True
-
+#  options.useNoHFMET=False
 
 
 
@@ -170,10 +181,11 @@ if "MC" in options.DataProcessing or options.DataProcessing ==  "Data_94X":
   metProcess = "PAT"
 elif options.DataProcessing ==  "Data_94X_2016":
   metProcess = "DQM"
-elif "Nov17" in option.DataProcessing:
+elif "Nov17" in options.DataProcessing:
+  metProcess = "RECO"
+if "Data_102X" in options.DataProcessing:
   metProcess = "RECO"
 hltProcess = "HLT"
-
 doElectronEnergyCorr=False
 #if "ReMiniAOD" in options.DataProcessing:
 #MiniAODv2*mc2017_realistic  doElectronEnergyCorr=False
@@ -377,10 +389,10 @@ listBTagInfos = [
      'pfDeepCSVTagInfos',
      ]
 listBtagDiscriminatorsAK4 = [ 
-		'pfJetProbabilityBJetTags',
+		'pfJetProbabilityBJetTags',#
 		'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 		'pfCombinedMVAV2BJetTags',
-		'pfCombinedCvsLJetTags',
+		'pfCombinedCvsLJetTags',#
 		'pfCombinedCvsBJetTags',
                 'pfDeepCSVDiscriminatorsJetTags:BvsAll',
                 'pfDeepCSVJetTags:probb',
@@ -388,10 +400,10 @@ listBtagDiscriminatorsAK4 = [
 
 		]
 listBtagDiscriminatorsAK8 = [ 
-		'pfJetProbabilityBJetTags',
+		'pfJetProbabilityBJetTags',#
 		'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 		'pfCombinedMVAV2BJetTags',
-		'pfCombinedCvsLJetTags',
+		'pfCombinedCvsLJetTags',#
 		'pfCombinedCvsBJetTags',
 		'pfBoostedDoubleSecondaryVertexAK8BJetTags',
 		'pfBoostedDoubleSecondaryVertexCA15BJetTags',
@@ -401,7 +413,7 @@ listBtagDiscriminatorsAK8 = [
 		]
 
 runMC = ("MC" in options.DataProcessing)
-
+#runMC = False
 # JER Twiki:
 #   https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution#Scale_factors
 # Get Latest txt files from:
@@ -413,34 +425,65 @@ jetAlgoAK8Puppi = 'AK8PFPuppi'
 
 ak8Cut='pt > 170 && abs(eta) < 2.4'
 
-jetToolbox( process, 
-		'ak4', 
-		'analysisPath', 
-		'edmNtuplesOut', 
-		runOnMC=runMC, 
-		updateCollection=jetAK4Label, 
-		JETCorrPayload=jetAlgo, 
-		addQGTagger=True,  
-		bTagDiscriminators=listBtagDiscriminatorsAK4, 
-		bTagInfos=listBTagInfos ) 
-
-jetToolbox( process, 
-		'ak4', 
-		'analysisPath', 
-		'edmNtuplesOut', 
-		runOnMC=runMC, 
-		updateCollection=jetAK4LabelPuppi,
-		JETCorrPayload='AK4PFPuppi', 
+#print "runmc is ", runMC
+if("Data_102X" in options.DataProcessing) or ("MC_Autumn18" in options.DataProcessing):
+  jetToolbox( process, 
+              'ak4', 
+              'analysisPath', 
+              'edmNtuplesOut', 
+              runOnMC=runMC, 
+              updateCollection=jetAK4Label, 
+              JETCorrPayload=jetAlgo, 
+              addQGTagger=False,  
+              #	bTagDiscriminators=listBtagDiscriminatorsAK4, 
+              #		bTagInfos=listBTagInfos 
+            ) 
+  
+  jetToolbox( process, 
+              'ak4', 
+              'analysisPath', 
+              'edmNtuplesOut', 
+              runOnMC=runMC, 
+              updateCollection=jetAK4LabelPuppi,
+              JETCorrPayload='AK4PFPuppi', 
 		JETCorrLevels=[ 'L2Relative', 'L3Absolute'], 
-		bTagDiscriminators=listBtagDiscriminatorsAK4, 
-		bTagInfos=listBTagInfos )  
+              #	bTagDiscriminators=listBtagDiscriminatorsAK4, 
+              #		bTagInfos=listBTagInfos 
+              )  
+else:
+  jetToolbox( process, 
+              'ak4', 
+              'analysisPath', 
+              'edmNtuplesOut', 
+              runOnMC=runMC, 
+              updateCollection=jetAK4Label, 
+              JETCorrPayload=jetAlgo, 
+              addQGTagger=False,  
+              bTagDiscriminators=listBtagDiscriminatorsAK4, 
+              bTagInfos=listBTagInfos 
+            ) 
+  
+  jetToolbox( process, 
+              'ak4', 
+              'analysisPath', 
+              'edmNtuplesOut', 
+              runOnMC=runMC, 
+              updateCollection=jetAK4LabelPuppi,
+              JETCorrPayload='AK4PFPuppi', 
+		JETCorrLevels=[ 'L2Relative', 'L3Absolute'], 
+              bTagDiscriminators=listBtagDiscriminatorsAK4, 
+              bTagInfos=listBTagInfos 
+              )  
 
 jetToolbox( process, 
 		'ak8', 
 		'analysisPath', 
 		'edmNtuplesOut', 
 		runOnMC=runMC, 
-		#updateCollection=jetAK8Label, 
+                GetJetMCFlavour=runMC,
+                GetSubjetMCFlavour=runMC,
+                #getSubJetMCFlavour=runMC,
+                #updateCollection=jetAK8Label, 
 		#updateCollectionSubjets=subjetAK8Label, 
 		#JETCorrPayload=jetAlgoAK8, 
 		addSoftDropSubjets=True, 
@@ -462,6 +505,8 @@ jetToolbox( process,
 		'analysisPath', 
 		'edmNtuplesOut', 
 		runOnMC=runMC, 
+                GetJetMCFlavour=runMC,
+                GetSubjetMCFlavour=runMC,
 		PUMethod='Puppi', 
 		addSoftDropSubjets=True, 
 		addTrimming=True, 
@@ -521,6 +566,12 @@ if options.useNoHFMET:
       cut=cms.string("abs(pdgId)!=1 && abs(pdgId)!=2 && abs(eta)<3.0")
       )
 
+  if"Data_102X" in options.DataProcessing or "MC_Autumn18" in options.DataProcessing :
+    process.noHFCands = cms.EDFilter("CandPtrSelector",
+                                     src=cms.InputTag("packedPFCandidates"),
+                                     cut=cms.string("abs(pdgId)!=1 && abs(pdgId)!=2 && !(eta> -3.14 && eta <-1.4 && phi >-1.57 && phi < -0.87) ")
+                                     )
+
   #jets are rebuilt from those candidates by the tools, no need to do anything else
 ### =================================================================================
 
@@ -528,18 +579,24 @@ if options.useNoHFMET:
 ### L1Prefiring to be added for 2016 and 2017
 ### ---------------------------------------------------------------------------
 
-if "MC_Fall17MiniAOD" in options.DataProcessing or "MC_Symmer16MiniAOD" in options.DataProcessing:
+if "MC_Fall17MiniAOD" in options.DataProcessing or "MC_Summer16MiniAOD" in options.DataProcessing:
   dataEra="2017BtoF"
-  if "MC_Symmer16MiniAOD" in options.DataProcessing:
+  if "MC_Summer16MiniAOD" in options.DataProcessing:
     dataEra="2016BtoH"
   process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
-                                           ThePhotons = cms.InputTag("slimmedPhotons"),
-                                           TheJets = cms.InputTag("slimmedJets"),
-                                           L1Maps = cms.string("L1PrefiringMaps_new.root"), # update this line with the location of this file
-                                           DataEra = cms.string(dataEra), #Use 2016BtoH for 2016
-                                           UseJetEMPt = cms.bool(False), #can be set to true to use jet prefiring maps parametrized vs pt(em) instead of pt
-                                           PrefiringRateSystematicUncty = cms.double(0.2) #Minimum relative prefiring uncty per object
-                                           )
+                                         ThePhotons = cms.InputTag("slimmedPhotons"),
+                                         TheJets = cms.InputTag("slimmedJets"),
+                                         L1Maps = cms.string("L1PrefiringMaps_new.root"), # update this line with the location of this file
+                                         DataEra = cms.string(dataEra), #Use 2016BtoH for 2016
+                                         UseJetEMPt = cms.bool(False), #can be set to true to use jet prefiring maps parametrized vs pt(em) instead of pt
+                                         PrefiringRateSystematicUncty = cms.double(0.2) #Minimum relative prefiring uncty per object
+                                                                                   )
+#  from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+#  process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
+#    DataEra = cms.string(dataEra), #Use 2016BtoH for 2016
+#    UseJetEMPt = cms.bool(False),
+#    PrefiringRateSystematicUncty = cms.double(0.2),
+#    SkipWarnings = False)
 
 ### ---------------------------------------------------------------------------
 ### ecalBadCalibFilter to be re-run for 2017 and 2018 
@@ -589,7 +646,7 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 if options.useNoHFMET:
   runMetCorAndUncFromMiniAOD (
     process,
-    isData = True, # false for MC
+    isData = ("Data" in options.DataProcessing),
     fixEE2017 = True,
     postfix = "NoHF"
 #    postx = "ModiedMET"
@@ -684,12 +741,11 @@ process.skimmedPatPuppiMET = cms.EDFilter(
 
 ##### THERE IS NO slimmedMETsNoHF in miniAODv2
 
-if(not options.useNoHFMET ): metNoHFLabel=metLabel
-
+if(not options.useNoHFMET ):   metNoHFLabel=metLabel
 
 process.skimmedPatMETNoHF = cms.EDFilter(
   "PATMETSelector",
-  src = cms.InputTag(metNoHFLabel, "", metProcess),
+  src = cms.InputTag(metNoHFLabel, ""),
   cut = cms.string("")
   )
 
@@ -930,6 +986,17 @@ from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 #    options.globalTag="94X_mcRun2_asymptotic_v3"
 
 
+if"Data_102X" in options.DataProcessing or "MC_Autumn18" in options.DataProcessing :
+  my_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff' ]
+  my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff','RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V2_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V2_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
+  setupEgammaPostRecoSeq(process,
+                         runEnergyCorrections=False,
+                         runVID=True, #saves CPU time by not needlessly re-running VID, if you want the Fall17V2 IDs, set this to True or remove (default is True)           
+                         eleIDModules=my_eid_modules,
+                         phoIDModules=my_phoid_modules,
+                         era='2018-Prompt')  
+
+
 if options.DataProcessing== "Data_94X" or options.DataProcessing=="MC_Fall17MiniAODv2":
   my_phoid_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff' ]
   my_eid_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Fall17_94X_V2_cff','RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V2_cff', 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V2_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff']
@@ -1040,9 +1107,9 @@ process.filteredPrunedGenParticles = cms.EDProducer(
     #OPT  # keep b and c hadrons for hadron-based jet flavour
     #OPT  "keep (400 < abs(pdgId) < 600) || (4000 < abs(pdgId) < 6000)",
     #OPT  # additional c hadrons for jet fragmentation studies
-    #OPT  "keep abs(pdgId) = 10411 || abs(pdgId) = 10421 || abs(pdgId) = 10413 || abs(pdgId) = 10423 || abs(pdgId) = 20413 || abs(pdgId) = 20423 || abs(pdgId) = 10431 || abs(pdgId) = 10433 || abs(pdgId) = 20433", 
+    #OPT  "keep abs(pdgId) = 10411 || abs(pdgId) = 10421 || abs(pdgId) = 10413 || abs(pdgId) = 10423 || abs(pdgId) = 20413 || abs(pdgId) = 20423 || abs(pdgId) = 10431 || abs(pdgId) = 10433 || abs(pdgId) = 20433, 
     #OPT  # additional b hadrons for jet fragmentation studies
-    #OPT  "keep abs(pdgId) = 10511 || abs(pdgId) = 10521 || abs(pdgId) = 10513 || abs(pdgId) = 10523 || abs(pdgId) = 20513 || abs(pdgId) = 20523 || abs(pdgId) = 10531 || abs(pdgId) = 10533 || abs(pdgId) = 20533 || abs(pdgId) = 10541 || abs(pdgId) = 10543 || abs(pdgId) = 20543", 
+    #OPT  "keep abs(pdgId) = 10511 || abs(pdgId) = 10521 || abs(pdgId) = 10513 || abs(pdgId) = 10523 || abs(pdgId) = 20513 || abs(pdgId) = 20523 || abs(pdgId) = 10531 || abs(pdgId) = 10533 || abs(pdgId) = 20533|| abs(pdgId) = 10541 || abs(pdgId) = 10543 || abs(pdgId) = 20543", 
     #keep SUSY particles
     #"keep (1000001 <= abs(pdgId) <= 1000039 ) || ( 2000001 <= abs(pdgId) <= 2000015)",
     # keep protons 
@@ -1069,17 +1136,17 @@ process.edmNtuplesOut = cms.OutputModule(
     "keep *_vertexInfo_*_*",
     "keep *_electrons_*_*",
     "keep *_prefiringweight_*_*",
-    "keep *_electronUserData_*_*",
-    "keep *_slimmedElectrons_*_*",
-    "keep *_slimmedPhotons_*_*",
-    "keep *_skimmedPatElectrons_*_*",
+#    "keep *_electronUserData_*_*",
+#    "keep *_slimmedElectrons_*_*",
+#    "keep *_slimmedPhotons_*_*",
+#    "keep *_skimmedPatElectrons_*_*",
     "keep *_photons_*_*",
     "keep *_jetsAK4CHS_*_*",
-    "keep *_jetsAK8CHS_*_*",
-    "keep *_subjetsAK8CHS_*_*",
+#    "keep *_jetsAK8CHS_*_*",
+#    "keep *_subjetsAK8CHS_*_*",
     "keep *_jetKeysAK4CHS_*_*",
-    "keep *_jetKeysAK8CHS_*_*",
-    "keep *_subjetKeysAK8CHS_*_*",
+#    "keep *_jetKeysAK8CHS_*_*",
+#    "keep *_subjetKeysAK8CHS_*_*",
     "keep *_jetsAK4Puppi_*_*",
     "keep *_jetsAK8Puppi_*_*",
     "keep *_subjetsAK8Puppi_*_*",
@@ -1102,23 +1169,24 @@ process.edmNtuplesOut = cms.OutputModule(
     "keep *_eventUserData_*_*",
     "keep *_BadPFMuonFilter_*_*",
     "keep *_BadChargedCandidateFilter_*_*",
-    "keep *_eeBadScFilter_*_*"
+    "keep *_eeBadScFilter_*_*",
+    "drop *pat*_*_*_*"
     ),
     dropMetaData = cms.untracked.string('ALL'),
     )
 
 
   ### keep NoHF jets if needed:
-if( options.useNoHFMET ):
-  process.edmNtuplesOut.outputCommands+=('keep *_jetsAK4NoHF_*_*',)
+#if( options.useNoHFMET ):
+#  process.edmNtuplesOut.outputCommands+=('keep *_jetsAK4NoHF_*_*',)
 
 if "MC" in options.DataProcessing: 
   process.edmNtuplesOut.outputCommands+=(
-      'keep *_generator_*_*',
-      #"keep *_genPart_*_*",
-      "keep *_filteredPrunedGenParticles_*_*",
-      "keep *_genJetsAK8*_*_*",
-      "keep *_genJetsAK8SoftDrop*_*_*",      
+#      'keep *_generator_*_*',
+#      #"keep *_genPart_*_*",
+#      "keep *_filteredPrunedGenParticles_*_*",
+#      "keep *_genJetsAK8*_*_*",
+#      "keep *_genJetsAK8SoftDrop*_*_*",      
       "keep LHEEventProduct_*_*_*",
       "keep LHERunInfoProduct_*_*_*"
       )

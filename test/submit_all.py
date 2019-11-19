@@ -86,6 +86,7 @@ def main():
     config.JobType.inputFiles = inFiles #options.inputFiles
     config.JobType.pyCfgParams = options.pyCfgParams
     config.JobType.sendExternalFolder = True
+    config.JobType.allowUndistributedCMSSW = True 
     
     config.Data.inputDataset = None
     config.Data.splitting = ''
@@ -120,7 +121,7 @@ def main():
         print '  --> added ' + s
         
     for ijob, job in enumerate(jobs) :
-
+        splitAuto=False
         ptbin = job.split('/')[1]
         cond = job.split('/')[2]
         datatier = job.split('/')[3]
@@ -131,9 +132,13 @@ def main():
         if datatier == 'MINIAODSIM': 
           config.Data.splitting = 'FileBased'
         elif datatier == 'MINIAOD': 
-          config.Data.splitting = 'LumiBased'
-          config.Data.lumiMask = options.lumiMask
-          config.Data.unitsPerJob = 24
+            if(splitAuto):
+                config.Data.splitting = 'Automatic'
+                config.Data.unitsPerJob = 600
+            else:
+                config.Data.splitting = 'LumiBased'
+                config.Data.unitsPerJob = 50
+            config.Data.lumiMask = options.lumiMask
 	if options.outLFNDirBase and not options.outLFNDirBase.isspace(): 
           config.Data.outLFNDirBase = os.path.join(options.outLFNDirBase,options.version,ptbin,cond.split('-')[0])
         config.Data.outputDatasetTag = cond+'_'+options.version
